@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cópia para Alunos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #1e40af;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 160px;
+        }
+        
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-green {
+            background: #16a34a;
+        }
+        
+        .btn-green:hover {
+            background: #15803d;
+        }
+        
+        .btn-red {
+            background: #dc2626;
+        }
+        
+        .btn-red:hover {
+            background: #b91c1c;
+        }
+        
+        .stats-bar {
+            background: #dbeafe;
+            padding: 1rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .text-display {
+            height: 250px;
+            overflow-y: auto;
+            padding: 1.5rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        
+        .word-highlight {
+            background-color: #fef08a;
+            font-weight: bold;
+            color: #16a34a;
+            padding: 2px;
+        }
+        
+        .current-word {
+            background: #16a34a;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .celebration {
+            background: linear-gradient(to right, #fbbf24, #f97316);
+            text-align: center;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 1.5rem 0;
+        }
+        
+        .nav-btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .nav-btn-prev {
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 50px 0 0 50px;
+        }
+        
+        .nav-btn-prev:hover {
+            background: #fecaca;
+        }
+        
+        .nav-btn-next {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 0 50px 50px 0;
+        }
+        
+        .nav-btn-next:hover {
+            background: #bbf7d0;
+        }
+        
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .slider-group label {
+            min-width: 200px;
+            font-size: 14px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+        }
+        
+        select {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            background: #d1d5db;
+            height: 8px;
+            border-radius: 8px;
+            width: 128px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #9ca3af;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.5s;
+            position: relative;
+        }
+        
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+        }
+        
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal h2 {
+            color: #1e40af;
+            margin-bottom: 1.5rem;
+        }
+        
+        .report-section {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .font-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Sistema de Cópia para Alunos</h1>
+        
+        <!-- Tela Inicial -->
+        <div id="inputScreen" class="card">
+            <label style="display: block; margin-bottom: 10px; font-weight: 600;">
+                Insira o texto original:
+            </label>
+            <textarea id="textoInput" placeholder="Digite ou cole o texto aqui..."></textarea>
+            <button onclick="iniciarExibicao()" style="width: 100%; margin-top: 1rem;">
+                Iniciar Exibição
+            </button>
+        </div>
+        
+        <!-- Tela de Exibição -->
+        <div id="displayScreen" class="hidden">
+            <!-- Barra de Estatísticas -->
+            <div class="stats-bar card">
+                <div class="stat-item">
+                    <div class="stat-value">📚 <span id="palavrasRestantes">0</span></div>
+                    <div class="stat-label">Faltam</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">⏱️ <span id="tempoRestante">0s</span></div>
+                    <div class="stat-label">Tempo restante</div>
+                </div>
+                <div class="stat-item">
+                    <label class="stat-label">Velocidade</label>
+                    <select id="velocidadeSelect" onchange="atualizarVelocidade()">
+                        <option value="5">5 PPM</option>
+                        <option value="6">6 PPM</option>
+                        <option value="8">8 PPM</option>
+                        <option value="10" selected>10 PPM</option>
+                        <option value="12">12 PPM</option>
+                        <option value="15">15 PPM</option>
+                        <option value="20">20 PPM</option>
+                        <option value="30">30 PPM</option>
+                        <option value="40">40 PPM</option>
+                        <option value="60">60 PPM</option>
+                        <option value="80">80 PPM</option>
+                        <option value="90">90 PPM</option>
+                        <option value="120">120 PPM</option>
+                        <option value="150">150 PPM</option>
+                        <option value="180">180 PPM</option>
+                        <option value="240">240 PPM</option>
+                    </select>
+                    <div class="stat-label">Palavras/min</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-left: auto;">
+                    <div class="stat-item">
+                        <span class="stat-value"><span id="percentagem">0</span>%</span>
+                        <span class="stat-label" style="margin-left: 5px;">concluído</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progressBar" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Área de Texto Superior -->
+            <div class="card">
+                <div id="textoSuperior" class="text-display"></div>
+            </div>
+            
+            <!-- Palavra Atual -->
+            <div class="card">
+                <div id="palavraAtual" class="current-word"></div>
+            </div>
+            
+            <!-- Controles -->
+            <div class="card controls">
+                <button onclick="voltarPalavra()">Anterior</button>
+                <button id="pauseBtn" onclick="alternarPausa()">Pausar</button>
+                <button onclick="avancarPalavra()">Próximo</button>
+                <button onclick="reiniciar()">Reiniciar</button>
+                <button onclick="novoTexto()" class="btn-green">Novo Texto</button>
+            </div>
+            
+            <!-- Botões de Navegação Grandes -->
+            <div class="nav-buttons">
+                <button onclick="voltarPalavra()" class="nav-btn nav-btn-prev">
+                    ← Anterior
+                </button>
+                <button onclick="avancarPalavra()" class="nav-btn nav-btn-next">
+                    Próximo →
+                </button>
+            </div>
+            
+            <!-- Controles de Ajuste -->
+            <div class="card">
+                <div class="slider-group">
+                    <label>Ajuste fino (<span id="velocidadeAtual">6.00</span>s/palavra):</label>
+                    <input type="range" id="sliderVelocidade" min="0.25" max="20" step="0.25" value="6" oninput="ajustarVelocidade()">
+                    <span id="ppmDisplay" style="min-width: 80px; font-weight: bold; font-size: 14px;">10.0 PPM</span>
+                </div>
+                
+                <div class="font-grid">
+                    <div class="slider-group">
+                        <label>Tamanho Fonte Superior:</label>
+                        <input type="range" id="tamanhoFonteSuperior" min="10" max="48" value="16" oninput="atualizarFontes()">
+                        <span id="tamSup" style="min-width: 50px; text-align: center;">16px</span>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Tamanho Fonte Inferior:</label>
+                        <input type="range" id="tamanhoFonteInferior" min="16" max="72" value="24" oninput="atualizarFontes()">
+                        <span id="tamInf" style="min-width: 50px; text-align: center;">24px</span>
+                    </div>
+                </div>
+                
+                <div class="font-grid">
+                    <div class="slider-group">
+                        <label>Fonte Superior:</label>
+                        <select id="fonteSuperior" onchange="atualizarFontes()">
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                            <option value="Trebuchet MS">Trebuchet MS</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Tahoma">Tahoma</option>
+                            <option value="Calibri">Calibri</option>
+                        </select>
+                    </div>
+                    
+                    <div class="slider-group">
+                        <label>Fonte Inferior:</label>
+                        <select id="fonteInferior" onchange="atualizarFontes()">
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Courier New">Courier New</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                            <option value="Trebuchet MS">Trebuchet MS</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Tahoma">Tahoma</option>
+                            <option value="Calibri">Calibri</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botão Relatório -->
+            <button onclick="mostrarRelatorio()" style="width: 100%; font-size: 1.2rem; padding: 1rem;">
+                📊 Gerar Relatório da Atividade
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal Relatório -->
+    <div id="modalRelatorio" class="modal hidden">
+        <div class="modal-content">
+            <h2>📊 Relatório de Atividade</h2>
+            <div id="conteudoRelatorio"></div>
+            <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
+                <button onclick="copiarRelatorio()" class="btn-green" style="flex: 1;">
+                    📋 Copiar Relatório
+                </button>
+                <button onclick="fecharRelatorio()" style="flex: 1; background: #6b7280;">
+                    ✕ Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let palavras = [];
+        let indiceAtual = 0;
+        let pausado = true;
+        let intervalo = null;
+        let velocidade = 6;
+        let palavrasPorMinuto = 10;
+        let totalPalavrasLidas = 0;
+        let numeroPausas = 0;
+        let numeroRetrocessos = 0;
+        let horaInicio = null;
+        
+        function processarTexto(texto) {
+            const palavrasArray = [];
+            const linhas = texto.split('\n');
+            
+            linhas.forEach((linha, indexLinha) => {
+                if (linha.trim() === '') {
+                    palavrasArray.push('\n');
+                } else {
+                    const palavrasLinha = linha.split(/(\s+)/);
+                    palavrasLinha.forEach(item => {
+                        if (item.trim() !== '') {
+                            palavrasArray.push(item);
+                        } else if (item.length > 0) {
+                            palavrasArray.push(item);
+                        }
+                    });
+                    if (indexLinha < linhas.length - 1) {
+                        palavrasArray.push('\n');
+                    }
+                }
+            });
+            
+            return palavrasArray;
+        }
+        
+        function iniciarExibicao() {
+            const texto = document.getElementById('textoInput').value;
+            if (!texto.trim()) {
+                alert('Por favor, insira um texto para começar.');
+                return;
+            }
+            
+            palavras = processarTexto(texto);
+            indiceAtual = 0;
+            pausado = false;
+            totalPalavrasLidas = 0;
+            numeroPausas = 0;
+            numeroRetrocessos = 0;
+            horaInicio = new Date();
+            
+            document.getElementById('inputScreen').classList.add('hidden');
+            document.getElementById('displayScreen').classList.remove('hidden');
+            document.getElementById('pauseBtn').textContent = 'Pausar';
+            
+            atualizarVisualizacao();
+            iniciarLoop();
+        }
+        
+        function iniciarLoop() {
+            if (intervalo) clearInterval(intervalo);
+            intervalo = setInterval(() => {
+                if (!pausado) {
+                    avancarPalavra();
+                }
+            }, velocidade * 1000);
+        }
+        
+        function avancarPalavra() {
+            if (indiceAtual >= palavras.length - 1) {
+                pausado = true;
+                document.getElementById('pauseBtn').textContent = 'Continuar';
+                
+                const ultimaPalavra = palavras[palavras.length - 1];
+                const ehUltimaPalavraReal = ultimaPalavra !== '\n' && ultimaPalavra.trim() !== '';
+                const totalPalavras = palavras.filter(p => p !== '\n' && p.trim() !== '').length;
+                
+                if (ehUltimaPalavraReal && totalPalavrasLidas < totalPalavras) {
+                    totalPalavrasLidas = totalPalavras;
+                }
+                
+                tocarSomConclusao();
+                setTimeout(() => alert('Parabéns! Texto concluído!'), 800);
+                return;
+            }
+            
+            const proximaPalavra = palavras[indiceAtual];
+            const ehPalavraReal = proximaPalavra !== '\n' && proximaPalavra.trim() !== '';
+            
+            if (ehPalavraReal && !pausado) {
+                totalPalavrasLidas++;
+            }
+            
+            indiceAtual++;
+            atualizarVisualizacao();
+        }
+        
+        function voltarPalavra() {
+            if (indiceAtual <= 0) return;
+            
+            const palavraAtual = palavras[indiceAtual - 1];
+            const ehPalavraReal = palavraAtual !== '\n' && palavraAtual.trim() !== '';
+            
+            if (ehPalavraReal) {
+                totalPalavrasLidas = Math.max(0, totalPalavrasLidas - 1);
+            }
+            
+            numeroRetrocessos++;
+            indiceAtual--;
+            atualizarVisualizacao();
+        }
+        
+        function alternarPausa() {
+            if (!pausado) {
+                numeroPausas++;
+            }
+            pausado = !pausado;
+            document.getElementById('pauseBtn').textContent = pausado ? 'Continuar' : 'Pausar';
+        }
+        
+        function reiniciar() {
+            indiceAtual = 0;
+            pausado = true;
+            totalPalavrasLidas = 0;
+            numeroPausas = 0;
+            numeroRetrocessos = 0;
+            horaInicio = new Date();
+            document.getElementById('pauseBtn').textContent = 'Continuar';
+            atualizarVisualizacao();
+        }
+        
+        function novoTexto() {
+            if (intervalo) clearInterval(intervalo);
+            document.getElementById('inputScreen').classList.remove('hidden');
+            document.getElementById('displayScreen').classList.add('hidden');
+            document.getElementById('textoInput').value = '';
+            palavras = [];
+            indiceAtual = 0;
+            pausado = true;
+        }
+        
+        function atualizarVisualizacao() {
+            const totalPalavras = palavras.filter(p => p !== '\n' && p.trim() !== '').length;
+            const palavrasRestantes = Math.max(0, totalPalavras - totalPalavrasLidas);
+            const percentagem = Math.min(100, Math.round((totalPalavrasLidas / Math.max(1, totalPalavras)) * 100));
+            
+            document.getElementById('palavrasRestantes').textContent = palavrasRestantes;
+            document.getElementById('percentagem').textContent = percentagem;
+            
+            const segundosRestantes = Math.round(palavrasRestantes * velocidade);
+            const minutos = Math.floor(segundosRestantes / 60);
+            const segundos = segundosRestantes % 60;
+            document.getElementById('tempoRestante').textContent = minutos > 0 ? `${minutos}m${segundos}s` : `${segundos}s`;
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percentagem + '%';
+            progressBar.style.background = percentagem < 30 ? '#EF4444' : percentagem < 70 ? '#F59E0B' : '#10B981';
+            
+            const textoAteAgora = palavras.slice(0, indiceAtual + 1);
+            let ultimaPalavra = '';
+            for (let i = textoAteAgora.length - 1; i >= 0; i--) {
+                if (textoAteAgora[i] !== '\n' && textoAteAgora[i].trim() !== '') {
+                    ultimaPalavra = textoAteAgora[i];
+                    break;
+                }
+            }
+            
+            const tamanhoSup = document.getElementById('tamanhoFonteSuperior').value;
+            const tamanhoInf = document.getElementById('tamanhoFonteInferior').value;
+            const fonteSup = document.getElementById('fonteSuperior').value;
+            const fonteInf = document.getElementById('fonteInferior').value;
+            
+            const textoSuperiorDiv = document.getElementById('textoSuperior');
+            textoSuperiorDiv.style.fontFamily = fonteSup;
+            textoSuperiorDiv.style.fontSize = tamanhoSup + 'px';
+            textoSuperiorDiv.innerHTML = '';
+            
+            textoAteAgora.forEach((palavra, idx) => {
+                if (palavra === '\n') {
+                    textoSuperiorDiv.appendChild(document.createElement('br'));
+                } else {
+                    const span = document.createElement('span');
+                    span.textContent = palavra;
+                    
+                    const ehDestaque = palavra === ultimaPalavra && idx === textoAteAgora.length - 1;
+                    if (ehDestaque) {
+                        span.className = 'word-highlight';
+                        span.style.fontSize = tamanhoInf + 'px';
+                    }
+                    
+                    textoSuperiorDiv.appendChild(span);
+                }
+            });
+            
+            const palavraAtualDiv = document.getElementById('palavraAtual');
+            palavraAtualDiv.style.fontFamily = fonteInf;
+            palavraAtualDiv.style.fontSize = tamanhoInf + 'px';
+            
+            if (indiceAtual >= palavras.length - 1) {
+                palavraAtualDiv.className = 'current-word celebration';
+                palavraAtualDiv.innerHTML = '<div style="text-align: center;"><div style="font-size: 3rem; margin-bottom: 10px;">🎉</div><span style="font-size: ' + (parseInt(tamanhoInf) + 8) + 'px;">PARABÉNS TERMINOU</span></div>';
+            } else {
+                palavraAtualDiv.className = 'current-word';
+                palavraAtualDiv.textContent = ultimaPalavra;
+            }
+        }
+        
+        function atualizarVelocidade() {
+            palavrasPorMinuto = parseInt(document.getElementById('velocidadeSelect').value);
+            velocidade = 60 / palavrasPorMinuto;
+            document.getElementById('sliderVelocidade').value = velocidade;
+            document.getElementById('velocidadeAtual').textContent = velocidade.toFixed(2);
+            document.getElementById('ppmDisplay').textContent = (60 / velocidade).toFixed(1) + ' PPM';
+            
+            if (intervalo) {
+                clearInterval(intervalo);
+                iniciarLoop();
+            }
+        }
+        
+        function ajustarVelocidade() {
+            velocidade = parseFloat(document.getElementById('sliderVelocidade').value);
+            const novoPPM = 60 / velocidade;
+            document.getElementById('velocidadeAtual').textContent = velocidade.toFixed(2);
+            document.getElementById('ppmDisplay').textContent = novoPPM.toFixed(1) + ' PPM';
+            
+            const opcoes = [5, 6, 8, 10, 12, 15, 20, 30, 40, 60, 80, 90, 120, 150, 180, 240];
+            const maisProximo = opcoes.reduce((prev, curr) => 
+                Math.abs(curr - novoPPM) < Math.abs(prev - novoPPM) ? curr : prev
+            );
+            document.getElementById('velocidadeSelect').value = maisProximo;
+            palavrasPorMinuto = maisProximo;
+            
+            if (intervalo) {
+                clearInterval(intervalo);
+                iniciarLoop();
+            }
+        }
+        
+        function atualizarFontes() {
+            const tamSup = document.getElementById('tamanhoFonteSuperior').value;
+            const tamInf = document.getElementById('tamanhoFonteInferior').value;
+            document.getElementById('tamSup').textContent = tamSup + 'px';
+            document.getElementById('tamInf').textContent = tamInf + 'px';
+            atualizarVisualizacao();
+        }
+        
+        function mostrarRelatorio() {
+            const totalPalavras = palavras.filter(p => p !== '\n' && p.trim() !== '').length;
+            const percentagem = Math.round((totalPalavrasLidas / Math.max(1, totalPalavras)) * 100);
+            const tempoDecorrido = horaInicio ? Math.floor((new Date() - horaInicio) / 1000) : 0;
+            const minutos = Math.floor(tempoDecorrido / 60);
+            const segundos = tempoDecorrido % 60;
+            
+            const html = `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div><strong>Data:</strong> ${new Date().toLocaleDateString('pt-PT')}</div>
+                    <div><strong>Hora:</strong> ${new Date().toLocaleTimeString('pt-PT')}</div>
+                </div>
+                <hr style="margin: 1rem 0;">
+                <h3 style="margin-bottom: 1rem; color: #4b5563;">Estatísticas da Sessão</h3>
+                <div class="report-section">
+                    <div class="report-row">
+                        <span>Total de palavras do texto:</span>
+                        <strong>${totalPalavras}</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Palavras lidas:</span>
+                        <strong style="color: #16a34a;">${totalPalavrasLidas}</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Percentagem concluída:</span>
+                        <strong style="color: #2563eb;">${percentagem}%</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Tempo decorrido:</span>
+                        <strong>${minutos}m ${segundos}s</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Velocidade utilizada:</span>
+                        <strong style="color: #f97316;">${palavrasPorMinuto} PPM</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Número de pausas:</span>
+                        <strong>${numeroPausas}</strong>
+                    </div>
+                    <div class="report-row">
+                        <span>Número de retrocessos:</span>
+                        <strong>${numeroRetrocessos}</strong>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('conteudoRelatorio').innerHTML = html;
+            document.getElementById('modalRelatorio').classList.remove('hidden');
+        }
+        
+        function fecharRelatorio() {
+            document.getElementById('modalRelatorio').classList.add('hidden');
+        }
+        
+        function copiarRelatorio() {
+            const totalPalavras = palavras.filter(p => p !== '\n' && p.trim() !== '').length;
+            const percentagem = Math.round((totalPalavrasLidas / Math.max(1, totalPalavras)) * 100);
+            const tempoDecorrido = horaInicio ? Math.floor((new Date() - horaInicio) / 1000) : 0;
+            const minutos = Math.floor(tempoDecorrido / 60);
+            const segundos = tempoDecorrido % 60;
+            
+            const relatorio = `RELATÓRIO DE ATIVIDADE DE LEITURA
+
+Data: ${new Date().toLocaleDateString('pt-PT')}
+Hora: ${new Date().toLocaleTimeString('pt-PT')}
+
+ESTATÍSTICAS DA SESSÃO
+Total de palavras do texto: ${totalPalavras}
+Palavras lidas: ${totalPalavrasLidas}
+Percentagem concluída: ${percentagem}%
+Tempo decorrido: ${minutos}m ${segundos}s
+Velocidade utilizada: ${palavrasPorMinuto} PPM
+Número de pausas: ${numeroPausas}
+Número de retrocessos: ${numeroRetrocessos}
+
+Gerado por: Sistema de Cópia para Alunos`;
+            
+            navigator.clipboard.writeText(relatorio).then(() => {
+                alert('Relatório copiado! Agora pode colar no Word.');
+            }).catch(() => {
+                alert('Erro ao copiar. Tente novamente.');
+            });
+        }
+        
+        function tocarSomConclusao() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const playNote = (frequency, startTime, duration) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.3, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + duration);
+                };
+                
+                const now = audioContext.currentTime;
+                playNote(523.25, now, 0.2);
+                playNote(659.25, now + 0.2, 0.2);
+                playNote(783.99, now + 0.4, 0.2);
+                playNote(1046.50, now + 0.6, 0.4);
+            } catch (e) {
+                console.log('Audio não suportado');
+            }
+        }
+    </script>
+</body>
+</html>
